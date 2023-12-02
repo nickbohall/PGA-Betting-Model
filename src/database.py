@@ -12,6 +12,6 @@ URL_DATABASE = 'postgresql://postgres:Lasallkid0!@localhost:5432/PgaData'
 
 engine = create_engine(URL_DATABASE)
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bine=engine)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

@@ -42,7 +42,7 @@ class PgaScrape:
             player_name = player_info.get_attribute('aria-label') # Grabbing just the name
 
             player_link = player_info.get_attribute('href') # Grabbing the href
-            player_id = ''.join(map(str, [int(i) for i in player_link if i.isdigit()])) # Parsing the href for the player_id
+            player_id = int(''.join(map(str, [int(i) for i in player_link if i.isdigit()]))) # Parsing the href for the player_id
 
             player_nationality = player.find_element(By.CSS_SELECTOR, 'span.css-rbcrqz p').text
             
