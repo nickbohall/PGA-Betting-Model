@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 class Player(BaseModel):
-    id: int
+    id: str
     name: str
     nationality: str
 

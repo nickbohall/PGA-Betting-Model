@@ -4,11 +4,12 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 from dotenv import load_dotenv
+from decouple import config
+from icecream import ic
 
 load_dotenv()
 
-URL_DATABASE = 'postgresql://postgres:Lasallkid0!@localhost:5432/PgaData'
-# URL_DATABASE = os.getenv['DATABASE_URL']
+URL_DATABASE = os.environ["DATABASE_URL"]
 
 engine = create_engine(URL_DATABASE)
 

@@ -8,7 +8,7 @@ from .database import Base
 
 class Player(Base):
     __tablename__ = "player"
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String, primary_key=True, index=True)
     name = Column(String)
     nationality = Column(String)
     time_created = Column(DateTime(timezone=True), server_default=func.now())
@@ -29,7 +29,7 @@ class Schedule(Base):
     time_created = Column(DateTime(timezone=True), server_default=func.now())
     time_updated = Column(DateTime(timezone=True), onupdate=func.now())
     tournament_id = Column(Integer, ForeignKey("tournament.id"))
-    player_id = Column(Integer, ForeignKey("player.id"))
+    player_id = Column(String, ForeignKey("player.id"))
 
     # tournament = relationship("Tournament")
     # player_id = relationship("Player")
