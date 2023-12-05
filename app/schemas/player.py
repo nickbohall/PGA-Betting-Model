@@ -4,14 +4,9 @@ class Player(BaseModel):
     id: str
     name: str
     nationality: str
-
-class Tournament(BaseModel):
-    id: int
-    name: str
-
-class Schedule(BaseModel):
-    year: int
-    finish: int
+    
+    class Config: 
+        from_attributes = True
 
 class PlayerStats(BaseModel):
     id: str
@@ -22,3 +17,5 @@ class PlayerStats(BaseModel):
     sg_atg: int
     sg_putt: int
 
+    class Config: 
+        from_attributes = True
