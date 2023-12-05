@@ -12,3 +12,13 @@ class Tournament(BaseModel):
 class Schedule(BaseModel):
     year: int
     finish: int
+
+class PlayerStats(BaseModel):
+    id: str
+    sg_total: int
+    sg_ttg: int
+    sg_ott: int
+    sg_apr: int
+    sg_atg: int
+    sg_putt: int
+

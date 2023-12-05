@@ -31,5 +31,14 @@ class Schedule(Base):
     tournament_id = Column(Integer, ForeignKey("tournament.id"))
     player_id = Column(String, ForeignKey("player.id"))
 
-    # tournament = relationship("Tournament")
-    # player_id = relationship("Player")
+class PlayerStats(Base):
+    __tablename__ = "player_stats"
+    id = Column(String, primary_key=True, index=True)
+    sg_total = Column(Integer)
+    sg_ttg = Column(Integer)
+    sg_ott = Column(Integer)
+    sg_apr = Column(Integer)
+    sg_atg = Column(Integer)
+    sg_putt = Column(Integer)
+    time_created = Column(DateTime(timezone=True), server_default=func.now())
+    time_updated = Column(DateTime(timezone=True), onupdate=func.now())

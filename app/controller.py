@@ -11,6 +11,10 @@ from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import NoSuchElementException
 
+from .main import get_players
+
+### TAKE AWAY IMPORT, MOVE LOGIC TO CONTROLLER, HAVE MAIN ONLY BE THERE FOR THE ENDPOINTS AND CALL THE CONTROLLER FUNCTIONS
+
 
 
 CURRENT_YEAR = dt.datetime.today().year
@@ -20,7 +24,7 @@ class PgaScrape:
     def __init__(self):
         options = Options()
         service = Service(ChromeDriverManager().install()) # This installs the latest ChromeDriver on use
-        options.add_argument('--headless')  # Set to True to not open the webpage
+        # options.add_argument('--headless')  # Set to True to not open the webpage
         options.add_argument('--ignore-certificate-errors') # Ignores a random error oops
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
         self.driver = webdriver.Chrome(options=options, service=service) # setup the driver when the class is initiated
@@ -55,36 +59,38 @@ class PgaScrape:
         return player_list
     
     def get_player_stats(self, player_list=None):
-        url = 'https://www.pgatour.com/stats' # Setting the base stats url
 
-        player_list = [{"player_id": "01226", "player_name": "Fred Couples"}, {"player_id":"01249", "player_name": "John Daly"}]
-        player_stats = [] # Create empty list to put the data
-        # Loop through the player list and go get their individual stats - This is probably gonna take a minute..
-        for player in player_list:
+        dict = get_players()
+        print(dict)
 
-            player_id = player["player_id"]
-            player_name = "-".join([x.lower() for x in player["player_name"].split(" ")])
+        base_url = "https://www.pgatour.com/stats/detail/"
+        url_list = [{"name": "SG: Total", "url_end":"02675"}, 
+                    {"name": "SG: T2G", "url_end":"02674"},
+                    {"name": "SG: OTT", "url_end":"02567"},
+                    {"name": "SG: APR", "url_end":"02568"},
+                    {"name": "SG: ATG", "url_end":"02569"},
+                    {"name": "SG: PUTT", "url_end":"02564"}]
+        
+        return_list = [{"player_name": 'Scottie Scheffler'}, {"player_name": 'Rory McIlroy'}]
+        
+        for url in url_list:
+            stat_name = url["name"]
+            self.driver.get(f"{base_url}{url['url_end']}")
+            time.sleep(8)
 
-            stat_dict = {"player_id": player_id} # Creating a dict to put stats into
+            rows = self.driver.find_elements(By.CSS_SELECTOR, "tr.css-79elbk")
+            for row in rows:
+                stat_dict = {}
+                player_name = row.find_element(By.CSS_SELECTOR, "td.css-1y50yag").text
+                average = row.find_element(By.CSS_SELECTOR, "td.css-mme8j7").text
 
-            url = f"https://www.pgatour.com/player/{player_id}/{player_name}/stats" # Grabbing url based on id and name
-
-            self.driver.get(url) # Initializing the driver on the url - This opens the page
-            time.sleep(10) # Giving the page time to load
+                for dict in return_list:
+                    if dict["player_name"] == player_name:
+                        dict[stat_name] = average
+                    else:
+                        pass
             
-            stats = self.driver.find_elements(By.CSS_SELECTOR, 'tr.css-79elbk')
-            
-            for stat in stats: # Loop through the stats and add them to the dict
-                stat_name = stat.find_element(By.CSS_SELECTOR, 'td.css-3g81zr').text
-                stat_value = stat.find_element(By.CSS_SELECTOR, 'td.css-4afaty span').text
-                stat_dict[stat_name] = stat_value
-            
-            player_stats.append(stat_dict)
-
-        return player_stats
-                
-                
-            
+        return return_list
 
     def get_tourney_info(self):
         pass
@@ -92,4 +98,4 @@ class PgaScrape:
     def get_schedule_info(self):
         pass
 
-print(PgaScrape().get_player_stats())
+# print(PgaScrape().get_player_stats())
