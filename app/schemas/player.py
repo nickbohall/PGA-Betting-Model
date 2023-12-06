@@ -1,21 +1,14 @@
 from pydantic import BaseModel
+from datetime import datetime
 
-class Player(BaseModel):
+class PlayerBase(BaseModel):
     id: str
     name: str
     nationality: str
+
+class PlayerCreate(PlayerBase):
+    ...
     
-    class Config: 
-        from_attributes = True
 
-class PlayerStats(BaseModel):
-    id: str
-    sg_total: int
-    sg_ttg: int
-    sg_ott: int
-    sg_apr: int
-    sg_atg: int
-    sg_putt: int
-
-    class Config: 
-        from_attributes = True
+class Player(PlayerBase):
+    ...

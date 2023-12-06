@@ -10,8 +10,11 @@ def get_player(db: Session, player_id: str):
 def get_player_by_name(db: Session, player_name: str):
     return db.query(Player).filter(Player.name == player_name).first()
 
-def get_players(db: Session, skip: int = 0, limit: int = 300):
-    return db.query(Player).offset(skip).limit(limit).all()
+def get_players(db: Session):
+    return db.query(Player).all()
+
+def get_player_names(db: Session):
+    return db.query(Player.name).all()
 
 def add_players(db: Session):
     player_list = get_player_info()
@@ -28,5 +31,5 @@ def add_players(db: Session):
     db.refresh(db_players)
     return db_players
 
-from app.services.player_stats_scrape import get_player_stats
+
 

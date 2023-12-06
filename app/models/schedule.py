@@ -14,5 +14,3 @@ class Schedule(Timestamp, Base):
 
     tournament_id = Column(Integer, ForeignKey("tournament.id"))
     player_id = Column(String, ForeignKey("player.id"))
-
-    player = relationship("Player", back_populates="schedule")
