@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 class Tournament(BaseModel):
-    id: int
+    id: str
     name: str
 
     class Config: 

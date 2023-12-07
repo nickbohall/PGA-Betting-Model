@@ -15,7 +15,7 @@ app = FastAPI()
 app.include_router(players.router)
 app.include_router(player_stats.router)
 # app.include_router(schedule.router)
-# app.include_router(tournaments.router)
+app.include_router(tournaments.router)
 
 @app.get("/")
 async def root():

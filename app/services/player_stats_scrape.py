@@ -53,7 +53,5 @@ def scrape_player_stats(db: Session, player_list=None):
                         dict[stat_name] = float(average)
                     else:
                         pass
-                    
-        return return_list
 
-# get_player_stats()
+        return return_list

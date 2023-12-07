@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from ..db.db_setup import Base
 from .mixins import Timestamp
 
-from ..models import player
+from ..models import player, tournament
 
 class Schedule(Timestamp, Base):
     __tablename__ = "schedule"
@@ -12,5 +12,5 @@ class Schedule(Timestamp, Base):
     year = Column(Integer)
     finish = Column(Integer)
 
-    tournament_id = Column(Integer, ForeignKey("tournament.id"))
+    tournament_name = Column(String, ForeignKey("tournament.name"))
     player_id = Column(String, ForeignKey("player.id"))
