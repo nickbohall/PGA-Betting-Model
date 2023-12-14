@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.db.db_setup import get_db
 from app.schemas.tournament import Tournament as TournamentSchema 
-from app.crud.tournaments import get_tournament, get_tournaments, add_tournaments
+from app.crud.tournaments import get_tournaments, add_tournaments
 
 router = fastapi.APIRouter()
 

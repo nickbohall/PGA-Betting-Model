@@ -10,6 +10,12 @@ def get_tournament(db: Session, tournament_id: str):
 def get_tournaments(db: Session):
     return db.query(Tournament).all()
 
+def get_tournament_names(db: Session):
+    return db.query(Tournament.name).all()
+
+def get_tournament_ids(db: Session):
+    return db.query(Tournament.id).all()
+
 def add_tournaments(db: Session):
     tourney_list = get_tourney_info()
     for ind_tourney in tourney_list:

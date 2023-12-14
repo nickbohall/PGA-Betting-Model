@@ -10,7 +10,10 @@ class Schedule(Timestamp, Base):
     __tablename__ = "schedule"
     id = Column(Integer, primary_key=True, index=True)
     year = Column(Integer)
+    tourney_id = Column(String)
+    tournament_name = Column(String)
+    player_id = Column(String)
+    player_name = Column(String)
     finish = Column(Integer)
+    score = Column(Integer)
 
-    tournament_name = Column(String, ForeignKey("tournament.name"))
-    player_id = Column(String, ForeignKey("player.id"))
