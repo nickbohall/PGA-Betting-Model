@@ -21,6 +21,6 @@ app.include_router(tournaments.router)
 
 @app.get("/")
 async def root():
-    return {"message": "This is a PGA Betting Model"}
+    return {"message": "This is a PGA Betting Model. To see API options add '/docs'. Thanks for looking!"}
     
 

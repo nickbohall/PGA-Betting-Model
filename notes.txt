@@ -1,0 +1,12 @@
+TODO:
+A script needs to be run to do the following things:
+
+Create master table:
+
+Run script before tournament
+
+1. Script should check schedule table to make sure it's up to date.
+2. Take in a "tournament input" and "year" to know what tournament is about to play 
+3. Update the player_stats table, and copy those values to master table for that tournamnet
+4. Run again after tournament to get actual scores and populate master table with results
+5. Maybe add a "predicted score" column here?

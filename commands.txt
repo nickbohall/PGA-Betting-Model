@@ -1,0 +1,19 @@
+Activate venv:
+venv/Scripts/activate
+
+Start app:
+uvicorn app.main:app --reload
+
+local host:
+http://127.0.0.1:8000/
+
+local host docs:
+http://127.0.0.1:8000/docs
+
+Alembic Notes:
+alembic init	Initializes Alembic in your project, creating necessary folders and configuration files (run once at project setup).
+alembic revision --autogenerate -m "Msg"	Generates a new revision file based on detected schema changes (autogenerate), adding your custom message.
+alembic show <revision_name>	Displays the contents of a specific revision file.
+alembic upgrade head	Applies changes from all revisions up to the latest (head) to your database.
+alembic downgrade <revision_name>	Reverts your database schema to the state defined in the specified revision file.
+alembic history	Lists all available Alembic revisions in your project.

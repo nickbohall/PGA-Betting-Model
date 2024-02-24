@@ -31,7 +31,7 @@ def get_schedule_info(db: Session, tourney_list=None):
     else:
 
         # years = list(range(CURRENT_YEAR - 5, CURRENT_YEAR - 1))
-        years = [2021]
+        years = [2022]
         tourney_list = []
 
         for tourney_id, tourney_name in zip(tourney_id_list, tourney_name_list):
@@ -42,7 +42,7 @@ def get_schedule_info(db: Session, tourney_list=None):
                 tourney_list.append(tourney_dict)
 
         output_list = []
-
+        print(tourney_list)
         driver = get_driver()
 
         for year in years:
@@ -54,9 +54,18 @@ def get_schedule_info(db: Session, tourney_list=None):
                 time.sleep(3)
                 rows = driver.find_elements(By.CSS_SELECTOR, "tr.css-79elbk")
                 for row in rows:
-                    pos = row.find_element(By.CSS_SELECTOR, "span.css-1bn4ecd").text
-                    player = row.find_element(By.CSS_SELECTOR, "td.css-182plxy a").get_attribute('href')
-                    score = row.find_elements(By.CSS_SELECTOR, "span.css-1q3u2k7")[-2].text
+                    try:
+                        pos = row.find_element(By.CSS_SELECTOR, "span.css-1bn4ecd").text
+                    except:
+                        pos = "NAN"
+                    try: 
+                        player = row.find_element(By.CSS_SELECTOR, "td.css-182plxy a").get_attribute('href')
+                    except:
+                        player = "NAN"
+                    try:
+                        score = row.find_elements(By.CSS_SELECTOR, "span.css-1q3u2k7")[-2].text
+                    except:
+                        score = "NAN"
 
                     # Parsing the information - Person Info
                     href_split = player.split("/")
@@ -94,7 +103,5 @@ def get_schedule_info(db: Session, tourney_list=None):
                         "finish": pos,
                         "score": score,
                     }
-                    print(tourney_name)
-                    print(player_name, player_id, pos, score)
                     output_list.append(tourney_dict)
         return output_list

@@ -28,12 +28,13 @@ def get_tourney_info():
         tourney_name = tourney.find_element(By.CSS_SELECTOR, 'p.css-vgdvwe').text
         try:
             tourney_link = tourney.find_element(By.CSS_SELECTOR, 'a.css-1jfg7sy').get_attribute('href')
-            tourney_id = (tourney_link.split("/"))[-1]
+            tourney_id = ((tourney_link.split("/"))[-1]).split("?")[0]
         except:
             tourney_id = "not found"
         tourney_dict = {"tournament_id": tourney_id, "tournament_name": tourney_name}
         tourney_list.append(tourney_dict)
-        
+
+    print('tourney list found!')    
     return tourney_list
 
 
