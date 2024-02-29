@@ -10,3 +10,11 @@ Run script before tournament
 3. Update the player_stats table, and copy those values to master table for that tournamnet
 4. Run again after tournament to get actual scores and populate master table with results
 5. Maybe add a "predicted score" column here?
+
+
+TODO:
+
+Names are not the same in different tables. 
+
+1. Use player table to match ID to name and update names in every table
+2. Will probably have to use tournamnet table to fill in all of the tourney information.

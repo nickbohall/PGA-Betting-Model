@@ -1,10 +1,12 @@
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Enum, Text
 from sqlalchemy.orm import relationship
 
+from . import master
+
 from .mixins import Timestamp
 
 from ..db.db_setup import Base
-from ..models import schedule, player_stats
+from ..models import player_stats
 
 
 class Player(Timestamp, Base):

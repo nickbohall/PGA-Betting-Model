@@ -6,7 +6,7 @@ from sqlalchemy import pool
 from alembic import context
 
 from app.db.db_setup import Base
-from app.models import player, tournament, schedule
+from app.models import master, player, tournament
 
 
 # this is the Alembic Config object, which provides

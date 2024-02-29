@@ -17,3 +17,9 @@ alembic show <revision_name>	Displays the contents of a specific revision file.
 alembic upgrade head	Applies changes from all revisions up to the latest (head) to your database.
 alembic downgrade <revision_name>	Reverts your database schema to the state defined in the specified revision file.
 alembic history	Lists all available Alembic revisions in your project.
+
+To update tables with existing models/schema (example):
+alembic revision --autogenerate -m "Drop existing tables"
+alembic upgrade head
+alembic revision --autogenerate -m "Add/Modify tables"
+alembic upgrade head

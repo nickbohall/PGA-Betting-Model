@@ -13,10 +13,12 @@ from app.crud.tournaments import get_tournament_names, get_tournament_ids
 from app.db.db_setup import get_db
 from app.models import tournament   
 from app.services.selenium_setup import get_driver, CURRENT_YEAR
+from app.models.player import Player
 
 pd.set_option('display.max_columns', None)
 
-def get_schedule_info(db: Session, tourney_list=None):
+
+def get_master_info(db: Session, tourney_list=None):
 
     
     tourney_id_object = get_tournament_ids(db=db)
@@ -31,7 +33,7 @@ def get_schedule_info(db: Session, tourney_list=None):
     else:
 
         # years = list(range(CURRENT_YEAR - 5, CURRENT_YEAR - 1))
-        years = [2022]
+        years = [2020, 2021, 2022, 2023]
         tourney_list = []
 
         for tourney_id, tourney_name in zip(tourney_id_list, tourney_name_list):
@@ -42,7 +44,6 @@ def get_schedule_info(db: Session, tourney_list=None):
                 tourney_list.append(tourney_dict)
 
         output_list = []
-        print(tourney_list)
         driver = get_driver()
 
         for year in years:
@@ -52,6 +53,11 @@ def get_schedule_info(db: Session, tourney_list=None):
                 url = f"https://www.pgatour.com/tournaments/{year}/{tourney_name}/{tourney_id}/past-results"
                 driver.get(url)
                 time.sleep(3)
+
+                try:
+                    course_name = driver.find_element(By.CSS_SELECTOR, "div.css-1m5weuf p").text
+                except: 
+                    course_name = "NAN"
                 rows = driver.find_elements(By.CSS_SELECTOR, "tr.css-79elbk")
                 for row in rows:
                     try:
@@ -69,8 +75,11 @@ def get_schedule_info(db: Session, tourney_list=None):
 
                     # Parsing the information - Person Info
                     href_split = player.split("/")
-                    player_name = href_split[-1].split("-")[0] + " " + href_split[-1].split("-")[-1]
                     player_id = ''.join(map(str, [int(i) for i in href_split if i.isdigit()]))
+                    try: 
+                        player_name = db.query(Player).filter(Player.id == player_id).first().name
+                    except:
+                        player_name = (href_split[-1].split("-")[0] + " " + href_split[-1].split("-")[1].split("?")[0]).title()
 
                     # Handling Cuts and ties
                     if pos == "CUT":
@@ -98,10 +107,12 @@ def get_schedule_info(db: Session, tourney_list=None):
                         "year": year, 
                         "tourney_id": tourney_id,
                         "tourney_name": tourney_name,
+                        "course_name": course_name,
                         "player_name": player_name, 
                         "player_id": player_id,
                         "finish": pos,
                         "score": score,
                     }
                     output_list.append(tourney_dict)
+            print(f"{year} scraped and added!")
         return output_list

@@ -1,12 +1,17 @@
 from sqlalchemy.orm import Session
 
 from app.models.player_stats import PlayerStat
+from app.models.master import Master
+from app.models.player import Player
 
 from app.services.player_stats_scrape import scrape_player_stats
 
 
-def get_player_stats(db: Session, skip: int = 0, limit: int = 300):
+def get_player_stats(db: Session):
     return db.query(PlayerStat).all()
+
+def get_player_stats_for_tourney(db:Session, tourney):
+    return db.query(PlayerStat).filter(Master.tournament == tourney)
 
 def add_player_stats(db: Session):
     player_stats = scrape_player_stats(db)
@@ -16,6 +21,7 @@ def add_player_stats(db: Session):
         try:
             db_player_stats = PlayerStat(
                 name = player_stat["player_name"],
+                id =  db.query(Player).filter(Player.name == player_stat["player_name"]).first().id,
                 sg_total = player_stat["SG: Total"],
                 sg_ttg = player_stat["SG: T2G"],
                 sg_ott = player_stat["SG: OTT"],

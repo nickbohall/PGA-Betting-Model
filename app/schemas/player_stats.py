@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 class PlayerStat(BaseModel):
     name: str
+    id: str
     sg_total: float
     sg_ttg: float
     sg_ott: float
