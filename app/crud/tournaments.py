@@ -21,8 +21,9 @@ def add_tournaments(db: Session):
     for ind_tourney in tourney_list:
 
         db_tourneys = Tournament(
-            id = ind_tourney["tournament_id"], 
-            name = ind_tourney["tournament_name"],
+            tourney_id = ind_tourney["tournament_id"], 
+            tourney_name = ind_tourney["tournament_name"],
+            course_name = ind_tourney["course_name"]
         )
 
         db.add(db_tourneys)

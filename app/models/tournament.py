@@ -6,5 +6,7 @@ from .mixins import Timestamp
 
 class Tournament(Timestamp, Base):
     __tablename__ = "tournament"
-    name = Column(String, primary_key=True, index=True)
-    id = Column(String)
+
+    tourney_name = Column(String, primary_key=True, index=True)
+    tourney_id = Column(String)
+    course_name = Column(String)

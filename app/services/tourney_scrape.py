@@ -15,7 +15,7 @@ pd.set_option('display.max_columns', None)
 def get_tourney_info():
     driver = get_driver()
 
-    url = 'https://www.pgatour.com/schedule/2022' # Setting the Schedule url
+    url = 'https://www.pgatour.com/schedule' # Setting the Schedule url
     driver.get(url) # Initializing the driver on the url - This opens the page
     time.sleep(3) # Giving the page time to load
 
@@ -25,13 +25,22 @@ def get_tourney_info():
 
     tourney_objects = driver.find_elements(By.CSS_SELECTOR, 'div.css-1itfnhz') # Grabs player element
     for tourney in tourney_objects:
-        tourney_name = tourney.find_element(By.CSS_SELECTOR, 'p.css-vgdvwe').text
+        tourney_name = (tourney.find_element(By.CSS_SELECTOR, 'p.css-vgdvwe').text).strip()
         try:
             tourney_link = tourney.find_element(By.CSS_SELECTOR, 'a.css-1jfg7sy').get_attribute('href')
-            tourney_id = ((tourney_link.split("/"))[-1]).split("?")[0]
+            tourney_id = (((tourney_link.split("/"))[-1]).split("?")[0]).strip()
         except:
-            tourney_id = "not found"
-        tourney_dict = {"tournament_id": tourney_id, "tournament_name": tourney_name}
+            tourney_id = "Tourney not found"
+
+        try:
+            course_name = tourney.find_element(By.CSS_SELECTOR, 'p.css-16dpohb').text
+        except:
+            course_name = "Course not found"
+
+        tourney_dict = {"tournament_id": tourney_id, 
+                        "tournament_name": tourney_name,
+                        "course_name": course_name,
+                        }
         tourney_list.append(tourney_dict)
 
     print('tourney list found!')    

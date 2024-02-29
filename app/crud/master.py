@@ -6,7 +6,7 @@ from app.models.player_stats import PlayerStat
 from app.models.tournament import Tournament
 from app.models.player import Player
 
-from app.services.master_scrape import get_master_info
+from app.services.master_scrape import get_current_tourney
 from app.services.pga_data_import import get_historical_data
 from app.crud.player_stats import get_player_stats_for_tourney
 
@@ -17,25 +17,29 @@ def get_master_by_tourney(db: Session, master_id: str):
 def get_masters_table(db: Session):
     return db.query(Master).all()
 
-def add_master_table(db: Session):
-    master_list = get_master_info(db)
-    for ind_master in master_list:
+def add_new_tourney_to_master(tournament_name, db: Session):
+    master_list = get_current_tourney(db=db, tourney_name=tournament_name)
 
-        db_tourneys = Master(
-            year = ind_master['year'],
-            tourney_id = ind_master['tourney_id'],
-            tournament_name = ind_master['tourney_name'],
-            course_name= ind_master['course_name'],
-            player_name = ind_master['player_name'],
-            player_id = ind_master['player_id'],
-            finish = ind_master['finish'],
-            score = ind_master['score']
+    
+    for row in master_list:
+
+        player_id = db.query(Player.id).filter(Player.name == row['player_name']).scalar()
+        course_name = db.query(Tournament).filter(Tournament.tourney_name == row['tourney_name']).first().course_name
+
+        new_tourney = Master(
+            year = row['year'],
+            tourney_id = row['tourney_id'],
+            tournament_name = row['tourney_name'],
+            course_name= course_name or "NAN",
+            player_name = row['player_name'],
+            player_id = player_id or "NAN",
+            odds = row['odds']
         )
 
-        db.add(db_tourneys)
+        db.add(new_tourney)
         db.commit()
-    db.refresh(db_tourneys)
-    return db_tourneys
+
+    return None
 
 
 def update_sg_stats(tournament_name: str, year: int, db: Session) -> None:
@@ -73,10 +77,10 @@ def get_historical_data_from_csv(db: Session):
 
     for row in data_for_sql:
         # Retrieve the Tournament object from the database
-        tournament = db.query(Tournament).filter(Tournament.name == row['tournament_name']).first()
+        tournament = db.query(Tournament).filter(Tournament.tourney_name == row['tournament_name']).first()
 
         # If the tournament is not found, set tourney_id to "NAN"
-        tourney_id = tournament.id if tournament else "NAN"
+        tourney_id = tournament.tourney_id if tournament else "NAN"
 
         player_id = db.query(Player.id).filter(Player.name == row['player_name']).scalar()
 

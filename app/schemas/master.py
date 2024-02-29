@@ -15,6 +15,7 @@ class Master(BaseModel):
     sg_apr: float
     sg_atg: float
     sg_putt: float
+    odds: int
 
     class Config: 
         from_attributes = True

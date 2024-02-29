@@ -3,116 +3,53 @@ import time
 from icecream import ic
 from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException
+from datetime import datetime
 
 # Selenium Imports
 from selenium.webdriver.common.by import By
 
 # Local Imports
-# from selenium_setup import get_driver, CURRENT_YEAR
-from app.crud.tournaments import get_tournament_names, get_tournament_ids
-from app.db.db_setup import get_db
-from app.models import tournament   
 from app.services.selenium_setup import get_driver, CURRENT_YEAR
-from app.models.player import Player
+from app.models.tournament import Tournament
+
+# db import 
+from sqlalchemy.orm import Session
 
 pd.set_option('display.max_columns', None)
 
+def get_current_tourney( db: Session, tourney_name, year=CURRENT_YEAR, tourney_id=None):
+    driver = get_driver()
 
-def get_master_info(db: Session, tourney_list=None):
+    tourney_id = db.query(Tournament).filter(Tournament.tourney_name == tourney_name).first().tourney_id
+    dashed_tourney_name = tourney_name.join("-")
 
-    
-    tourney_id_object = get_tournament_ids(db=db)
-    tourney_id_list = [tourney_id_object[0] for tourney_id_object in tourney_id_object]
+    url = f"https://www.pgatour.com/tournaments/{year}/{dashed_tourney_name}/{tourney_id}"
 
-    tourney_name_object = get_tournament_names(db=db)
-    tourney_name_list = [tourney_name_object[0] for tourney_name_object in tourney_name_object]
-    tourney_name_list = ["-".join(map(lambda x: x.lower(), name.split())) for name in tourney_name_list]
+    driver.get(url)
+    time.sleep(3)
 
-    if not tourney_name_list or not tourney_id_list:
-        print("could not get tourney list")
-    else:
+    output_list = []
 
-        # years = list(range(CURRENT_YEAR - 5, CURRENT_YEAR - 1))
-        years = [2020, 2021, 2022, 2023]
-        tourney_list = []
+    rows = driver.find_elements(By.CSS_SELECTOR, "tr.css-1s076fv")
 
-        for tourney_id, tourney_name in zip(tourney_id_list, tourney_name_list):
-            if tourney_id == "not found":
-                pass
-            else:
-                tourney_dict = {"tourney_id": tourney_id, "tourney_name": tourney_name}
-                tourney_list.append(tourney_dict)
+    for row in rows:
+        player_name = row.find_element(By.CSS_SELECTOR, "td.css-1tm7emw span").text
+        try:
+            odds = int((row.find_element(By.CSS_SELECTOR, "span.css-1yh709r").text).replace("+", ''))
+        except:
+            odds = 6969
+        print(player_name)
+        print(odds)
+        print(type(odds))
 
-        output_list = []
-        driver = get_driver()
-
-        for year in years:
-            for tourney in tourney_list:
-                tourney_id = tourney['tourney_id']
-                tourney_name = tourney['tourney_name']
-                url = f"https://www.pgatour.com/tournaments/{year}/{tourney_name}/{tourney_id}/past-results"
-                driver.get(url)
-                time.sleep(3)
-
-                try:
-                    course_name = driver.find_element(By.CSS_SELECTOR, "div.css-1m5weuf p").text
-                except: 
-                    course_name = "NAN"
-                rows = driver.find_elements(By.CSS_SELECTOR, "tr.css-79elbk")
-                for row in rows:
-                    try:
-                        pos = row.find_element(By.CSS_SELECTOR, "span.css-1bn4ecd").text
-                    except:
-                        pos = "NAN"
-                    try: 
-                        player = row.find_element(By.CSS_SELECTOR, "td.css-182plxy a").get_attribute('href')
-                    except:
-                        player = "NAN"
-                    try:
-                        score = row.find_elements(By.CSS_SELECTOR, "span.css-1q3u2k7")[-2].text
-                    except:
-                        score = "NAN"
-
-                    # Parsing the information - Person Info
-                    href_split = player.split("/")
-                    player_id = ''.join(map(str, [int(i) for i in href_split if i.isdigit()]))
-                    try: 
-                        player_name = db.query(Player).filter(Player.id == player_id).first().name
-                    except:
-                        player_name = (href_split[-1].split("-")[0] + " " + href_split[-1].split("-")[1].split("?")[0]).title()
-
-                    # Handling Cuts and ties
-                    if pos == "CUT":
-                        pos = 99
-                    elif "T" in pos:
-                        pos = int(pos.replace('T', ''))
-                    elif pos == "W/D":
-                        pos = 98
-                    elif pos == "NAN":
-                        pos = 101
-                    elif pos == "DQ":
-                        pos = 98
-                    else: 
-                        pos = int(pos)
-
-                    # Handling Even
-                    if score == "E":
-                        score = 0
-                    elif score == "NAN":
-                        score = 99
-                    else: 
-                        score = int(score)
-
-                    tourney_dict = {
+        tourney_dict = {
                         "year": year, 
                         "tourney_id": tourney_id,
                         "tourney_name": tourney_name,
-                        "course_name": course_name,
                         "player_name": player_name, 
-                        "player_id": player_id,
-                        "finish": pos,
-                        "score": score,
+                        "odds": odds
                     }
-                    output_list.append(tourney_dict)
-            print(f"{year} scraped and added!")
-        return output_list
+        output_list.append(tourney_dict)
+    print(f"{tourney_name} scraped and added to db")
+
+    return output_list

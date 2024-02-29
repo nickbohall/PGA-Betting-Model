@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 # Local Imports
 from app.db.db_setup import get_db
 from app.schemas.master import Master as MasterSchema 
-from app.crud.master import get_historical_data_from_csv, get_masters_table, add_master_table, update_sg_stats
+from app.crud.master import get_historical_data_from_csv, get_masters_table, add_new_tourney_to_master, update_sg_stats
 
 from app.models.player import Player
 
@@ -22,15 +22,15 @@ async def read_master_from_db(db: Session = db_dependency, skip: int = 0, limit:
         raise HTTPException(status_code=404, detail="No masters found")
     return db_masters 
 
-@router.post("/master", response_model=MasterSchema, status_code=201)
-async def add_master_to_db(db: Session = db_dependency):
-    return add_master_table(db=db)
+@router.post("/master/add_tourney{tournament_name}", response_model=MasterSchema, status_code=201)
+async def add_master_to_db(tournament_name: str, db: Session = db_dependency):
+    return add_new_tourney_to_master(tournament_name=tournament_name, db=db)
 
-@router.patch("/master/{tournament_name}/{year}/",)
+@router.patch("/master/add_tourney_SG{tournament_name}/{year}/",)
 async def update_sg_stats_to_db(tournament_name: str, year: str, db: Session = db_dependency):
     return update_sg_stats(tournament_name=tournament_name, year=int(year), db=db)
 
-@router.post("/master/historical", response_model=MasterSchema, status_code=201)
+@router.post("/master/add_historical_data", response_model=MasterSchema, status_code=201)
 async def add_historical_data_to_master(db: Session = db_dependency):
     return get_historical_data_from_csv(db=db)
 

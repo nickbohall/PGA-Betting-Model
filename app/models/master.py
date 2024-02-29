@@ -23,4 +23,5 @@ class Master(Timestamp, Base):
     sg_apr = Column(Float)
     sg_atg = Column(Float)
     sg_putt = Column(Float)
+    odds = Column(Integer)
 
