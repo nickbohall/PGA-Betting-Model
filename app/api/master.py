@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 # Local Imports
 from app.db.db_setup import get_db
 from app.schemas.master import Master as MasterSchema 
-from app.crud.master import get_historical_data_from_csv, get_masters_table, add_new_tourney_to_master, update_sg_stats
+from app.crud.master import *
 
 from app.models.player import Player
 
@@ -33,6 +33,10 @@ async def update_sg_stats_to_db(tournament_name: str, year: str, db: Session = d
 @router.post("/master/add_historical_data", response_model=MasterSchema, status_code=201)
 async def add_historical_data_to_master(db: Session = db_dependency):
     return get_historical_data_from_csv(db=db)
+
+@router.patch("/master/add_tourney_finishes{tournament_name}/{year}/",)
+async def add_tourney_finishes(tournament_name: str, year: str, db: Session = db_dependency):
+    return add_tourney_finishes_to_master(tournament_name=tournament_name, year=int(year), db=db)
 
 # Just for testing shit
 @router.get("/test")

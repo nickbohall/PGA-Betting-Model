@@ -8,6 +8,7 @@ from app.models.player import Player
 
 from app.services.master_scrape import get_current_tourney
 from app.services.pga_data_import import get_historical_data
+from app.services.finish_scrape import get_current_tourney_finish
 from app.crud.player_stats import get_player_stats_for_tourney
 
 
@@ -22,8 +23,10 @@ def add_new_tourney_to_master(tournament_name, db: Session):
 
     
     for row in master_list:
+        player = db.query(Player).filter(Player.name == row['player_name']).first()
 
-        player_id = db.query(Player.id).filter(Player.name == row['player_name']).scalar()
+        # If the player is not found, set player_id to "NAN"
+        player_id = player.id if player else "NAN"
         course_name = db.query(Tournament).filter(Tournament.tourney_name == row['tourney_name']).first().course_name
 
         new_tourney = Master(
@@ -32,14 +35,14 @@ def add_new_tourney_to_master(tournament_name, db: Session):
             tournament_name = row['tourney_name'],
             course_name= course_name or "NAN",
             player_name = row['player_name'],
-            player_id = player_id or "NAN",
-            odds = row['odds']
+            player_id = player_id,
+            odds = row['odds'],
         )
 
         db.add(new_tourney)
         db.commit()
 
-    return None
+    return new_tourney
 
 
 def update_sg_stats(tournament_name: str, year: int, db: Session) -> None:
@@ -55,12 +58,12 @@ def update_sg_stats(tournament_name: str, year: int, db: Session) -> None:
     for player_id, stats in player_stats.items():
 
         update_dict = {
-            'sg_total': getattr(stats, 'sg_apr'),
+            'sg_total': getattr(stats, 'sg_total'),
             'sg_ttg': getattr(stats, 'sg_atg'),
             'sg_ott': getattr(stats, 'sg_ott'),
-            'sg_apr': getattr(stats, 'sg_putt'),
-            'sg_atg': getattr(stats, 'sg_total'),
-            'sg_putt': getattr(stats, 'sg_ttg'),
+            'sg_apr': getattr(stats, 'sg_apr'),
+            'sg_atg': getattr(stats, 'sg_atg'),
+            'sg_putt': getattr(stats, 'sg_putt'),
         }
 
         db.query(Master) \
@@ -106,3 +109,26 @@ def get_historical_data_from_csv(db: Session):
     db.refresh(db_tourneys)
     print("Historical data added to db!")
     return db_tourneys
+
+def add_tourney_finishes_to_master(tournament_name, year, db: Session):
+    player_finishes = get_current_tourney_finish(db=db, tourney_name=tournament_name)
+
+    # Update Master table with statistics
+    for row in player_finishes:
+        player = db.query(Player).filter(Player.name == row['player_name']).first()
+
+        # If the player is not found, set player_id to "NAN"
+        player_id = player.id if player else "NAN"
+        
+        update_dict = {
+            "finish": row['player_finish'],
+            "score": row['player_score'],
+        }
+
+        db.query(Master) \
+        .filter_by(player_id=player_id, tournament_name=tournament_name, year=year) \
+        .update(update_dict)
+
+    db.commit()  # Commit changes to the database
+
+    return None  # This function doesn't return data, so return None

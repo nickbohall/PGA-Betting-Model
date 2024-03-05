@@ -7,14 +7,14 @@ class Master(BaseModel):
     course_name: str
     player_name: str
     player_id: str
-    finish: int
-    score: int
-    sg_total: float
-    sg_ttg: float
-    sg_ott: float
-    sg_apr: float
-    sg_atg: float
-    sg_putt: float
+    finish: int = None
+    score: int = None
+    sg_total: float = None
+    sg_ttg: float = None
+    sg_ott: float = None
+    sg_apr: float = None
+    sg_atg: float = None
+    sg_putt: float = None
     odds: int
 
     class Config: 
