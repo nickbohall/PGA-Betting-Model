@@ -24,7 +24,7 @@ async def read_master_from_db(db: Session = db_dependency, skip: int = 0, limit:
 
 @router.post("/master/add_tourney{tournament_name}", response_model=MasterSchema, status_code=201)
 async def add_master_to_db(tournament_name: str, db: Session = db_dependency):
-    return add_new_tourney_to_master(tournament_name=tournament_name, db=db)
+    return add_new_tourney_to_master(tournament_name=tournament_name, db=db) or None
 
 @router.patch("/master/add_tourney_SG{tournament_name}/{year}/",)
 async def update_sg_stats_to_db(tournament_name: str, year: str, db: Session = db_dependency):

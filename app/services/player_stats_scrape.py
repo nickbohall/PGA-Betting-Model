@@ -45,8 +45,8 @@ def scrape_player_stats(db: Session, player_list=None):
 
             rows = driver.find_elements(By.CSS_SELECTOR, "tr.css-79elbk")
             for row in rows:
-                player_name = row.find_element(By.CSS_SELECTOR, "td.css-1y50yag").text
-                average = row.find_element(By.CSS_SELECTOR, "td.css-mme8j7").text
+                player_name = row.find_element(By.CSS_SELECTOR, "td.css-12jturn").text
+                average = row.find_element(By.CSS_SELECTOR, "td.css-l4z11p").text
 
                 for dict in return_list:
                     if dict["player_name"] == player_name:

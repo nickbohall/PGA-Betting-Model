@@ -30,10 +30,10 @@ def get_current_tourney( db: Session, tourney_name, year=CURRENT_YEAR, tourney_i
 
     output_list = []
 
-    rows = driver.find_elements(By.CSS_SELECTOR, "tr.css-1s076fv")
+    rows = driver.find_elements(By.CSS_SELECTOR, "tr.css-1qtrmek")
 
     for row in rows:
-        player_name = row.find_element(By.CSS_SELECTOR, "td.css-1tm7emw span").text
+        player_name = row.find_element(By.CSS_SELECTOR, "td.css-1y9jg86 span").text
         try:
             odds = int((row.find_element(By.CSS_SELECTOR, "span.css-1yh709r").text).replace("+", ''))
         except:

@@ -30,12 +30,12 @@ def get_current_tourney_finish( db: Session, tourney_name, year=CURRENT_YEAR, to
 
     output_list = []
 
-    rows = driver.find_elements(By.CSS_SELECTOR, "tr.css-1s076fv")
+    rows = driver.find_elements(By.CSS_SELECTOR, "tr.css-1qtrmek")
 
     for row in rows:
-        player_name = row.find_element(By.CSS_SELECTOR, "td.css-1tm7emw span").text
-        player_finish_str = row.find_element(By.CSS_SELECTOR, "td.css-1gqz8q0 span").text
-        player_score_str = row.find_element(By.CSS_SELECTOR, "td.css-mme8j7 span").text
+        player_name = row.find_element(By.CSS_SELECTOR, "td.css-1y9jg86 span").text
+        player_finish_str = row.find_element(By.CSS_SELECTOR, "td.css-ryx8py span").text
+        player_score_str = row.find_element(By.CSS_SELECTOR, "td.css-l4z11p span").text
 
         if player_finish_str == "CUT":
             player_finish = 99
@@ -66,5 +66,6 @@ def get_current_tourney_finish( db: Session, tourney_name, year=CURRENT_YEAR, to
         output_list.append(tourney_dict)
 
     print(f"{tourney_name} finishes scraped. Adding to db")
+    print(output_list)
 
     return output_list
