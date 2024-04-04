@@ -9,12 +9,12 @@ from selenium.webdriver.common.by import By
 # Local Imports
 from app.services.selenium_setup import get_driver, CURRENT_YEAR
 
-
 pd.set_option('display.max_columns', None)
 
 
 def get_player_info():
-
+    
+    # update the player list first to make sure we have everyone
     driver = get_driver()
 
     url = 'https://www.pgatour.com/players' # Setting the players url
@@ -42,5 +42,7 @@ def get_player_info():
         player_dict = {"id": player_id, "name": player_name, "nationality": player_nationality}
         
         player_list.append(player_dict)
-        
+
+
+    print(f"Scrape successful! {len(player_list)} players scraped. Attempting to add to db!")      
     return player_list

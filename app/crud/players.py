@@ -18,6 +18,7 @@ def get_player_names(db: Session):
 
 def add_players(db: Session):
     player_list = get_player_info()
+    
     for ind_player in player_list:
 
         db_players = Player(
@@ -31,5 +32,27 @@ def add_players(db: Session):
     db.refresh(db_players)
     return db_players
 
+def add_or_update_players(db: Session):
+    player_list = get_player_info()
+
+    for ind_player in player_list:
+        # Check if player exists in the database
+        existing_player = db.query(Player).filter(Player.id == ind_player["id"]).first()
+
+        if existing_player:
+            # Update player information
+            existing_player.name = ind_player["name"]
+            existing_player.nationality = ind_player["nationality"]
+        else:
+            # Add new player
+            print(f"/n New players:{ind_player}")
+            db_player = Player(
+                id=ind_player["id"],
+                name=ind_player["name"],
+                nationality=ind_player["nationality"]
+            )
+            db.add(db_player)
+    db.commit()
+    return player_list
 
 

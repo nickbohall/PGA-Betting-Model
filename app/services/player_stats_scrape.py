@@ -9,18 +9,23 @@ from selenium.webdriver.common.by import By
 
 # Local Imports
 from app.crud.players import get_player_names
+from app.api.players import add_players_to_db
 from app.services.selenium_setup import get_driver, CURRENT_YEAR
 from app.db.db_setup import get_db
 from app.models import player
+
 
 pd.set_option('display.max_columns', None)
 
 def scrape_player_stats(db: Session, player_list=None):
 
+    # First call the players post to make sure we have updated players 
+    add_players_to_db(db)
+    
     # Using a get request to get all player names from db
     player_object = get_player_names(db=db)
     player_list = [player_object[0] for player_object in player_object] # Turning the object to a list
-    print(len(player_list))
+    print(f"Scraping player stats for {(len(player_list))} players!")
 
     
     if not player_list:
@@ -53,5 +58,6 @@ def scrape_player_stats(db: Session, player_list=None):
                         dict[stat_name] = float(average)
                     else:
                         pass
-
+            print(f"{stat_name} scraped!")
+        print("Scrape Successful - Attempting to post to DB\n")
         return return_list

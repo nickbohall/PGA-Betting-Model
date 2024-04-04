@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import update
 from pydantic import ValidationError
+from sqlalchemy.future import select
 
 from app.models.master import Master
 from app.models.player_stats import PlayerStat
@@ -17,7 +18,9 @@ def get_master_by_tourney(db: Session, master_id: str):
     return db.query(Master).filter(Master.id == master_id).first()
 
 def get_masters_table(db: Session):
-    return db.query(Master).all()
+    query = select(Master)
+    result = db.execute(query)
+    return result.scalars().fetchall()
 
 def add_new_tourney_to_master(tournament_name, db: Session):
     master_list = get_current_tourney(db=db, tourney_name=tournament_name)
@@ -47,7 +50,6 @@ def add_new_tourney_to_master(tournament_name, db: Session):
             sg_putt=None,  # Set to None if not applicable
         )
 
-        print(new_tourney)
         db.add(new_tourney)
         db.commit()
 

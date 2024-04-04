@@ -1,60 +1,61 @@
 import pandas as pd
 import numpy as np
 
-def calculate_weighted_sg(df, player_name, window_size=5, weights=[0.4, 0.3, 0.2, 0.1]):
-  
-  """
-  This function calculates the weighted average of strokes gained metrics for a player
-  based on the last 'window_size' tournaments (excluding the current one).
+def calculate_weighted_sg(df, player_name, window_size=4, weights=[0.4, 0.3, 0.2, 0.1]):
+    """
+    This function calculates the weighted average of strokes gained metrics for a player
+    based on the last 'window_size' tournaments (excluding the current one).
 
-  Args:
-      df: The pandas DataFrame containing the golf tournament data.
-      player_name: The name of the player for whom to calculate the weighted average.
-      window_size: The number of previous tournaments to consider (default: 5).
-      weights: A list of weights for each previous tournament (default: [0.4, 0.3, 0.2, 0.1]).
+    Args:
+        df: The pandas DataFrame containing the golf tournament data.
+        player_name: The name of the player for whom to calculate the weighted average.
+        window_size: The number of previous tournaments to consider (default: 4).
+        weights: A list of weights for each previous tournament (default: [0.4, 0.3, 0.2, 0.1]).
 
-  Returns:
-      A dictionary containing the weighted average for each sg metric (sg_putt, sg_arg, etc.).
-  """
+    Returns:
+        A dictionary containing the weighted average for each sg metric (sg_putt, sg_arg, etc.).
+    """
 
-  # Filter data for the specific player
-  player_data = df[df['player_name'] == player_name]
+    # Filter data for the specific player
+    player_data = df[df['player_name'] == player_name]
 
-  # Sort data by date in descending order (newest to oldest)
-  player_data = player_data.sort_values(by='date', ascending=False)
+    # Sort data by date in ascending order (oldest to newest)
+    player_data = player_data.sort_values(by='date', ascending=True)
 
-  # Initialize empty dictionary to store weighted averages
-  weighted_sg = {}
-  for metric in ['sg_putt', 'sg_arg', 'sg_app', 'sg_ott', 'sg_t2g', 'sg_total']:
-    weighted_sg[metric] = 0
+    # Limit the data to the last 'window_size' tournaments
+    player_data = player_data.iloc[-window_size:]
 
-  # Loop through available previous tournaments (up to window_size)
-  for i in range(1, min(window_size, len(player_data))):
-    # Get the current and previous tournament data
-    current_data = player_data.iloc[0]
-    previous_data = player_data.iloc[i]
+    # Initialize empty dictionary to store weighted averages
+    weighted_sg = {}
+    for metric in ['sg_putt', 'sg_arg', 'sg_app', 'sg_ott', 'sg_t2g', 'sg_total']:
+        weighted_sg[metric] = 0
 
-    # Calculate the weighted average for each metric
-    for metric in weighted_sg.keys():
-      weighted_sg[metric] += previous_data[metric] * weights[i - 1]
+    # Check if there are previous tournaments for the player
+    if len(player_data) > 0:
+        # Loop through available previous tournaments
+        for i, (_, tournament) in enumerate(player_data.iterrows()):
+            # Calculate the weighted average for each metric
+            for metric in weighted_sg.keys():
+                weighted_sg[metric] += tournament[metric] * weights[i]
 
-  # Normalize the weighted average by the number of available data points
-  if len(player_data) > 1:
-    # Avoid division by zero if only one data point available
-    norm_factor = sum(weights)
-  else:
-    norm_factor = len(player_data)
-  for metric in weighted_sg.keys():
-    weighted_sg[metric] /= norm_factor
+        # Normalize the weighted average by the sum of weights
+        norm_factor = sum(weights[:len(player_data)])
+        for metric in weighted_sg.keys():
+            weighted_sg[metric] /= norm_factor
 
-  # Round the weighted averages to 3 decimal places
-  for metric in weighted_sg.keys():
-    weighted_sg[metric] = round(weighted_sg[metric], 3)
+        # Round the weighted averages to 3 decimal places
+        for metric in weighted_sg.keys():
+            weighted_sg[metric] = round(weighted_sg[metric], 3)
+    else:
+        # Handle case where there are no previous tournaments for the player
+        # Set all weighted sg statistics to zero
+        for metric in weighted_sg.keys():
+            weighted_sg[metric] = -2
 
-  return weighted_sg
+    return weighted_sg
+
 
 def get_historical_data():
-    
     # Reading in historical csv
     path = "C:/Users/Sleepycornbread/Python Projects/Portfolio Projects/PGA Webscraper/Data In/sql_ingest_2015-2022.csv"
     raw_df = pd.read_csv(path)
@@ -78,18 +79,33 @@ def get_historical_data():
     # Create an empty dictionary to store weighted sg averages for all players
     weighted_sg_data = {}
 
-    # Loop through each player name in the dataframe
-    for player_name in df['player_name'].unique():
-        
-        # Calculate weighted sg for the player and store it in the dictionary
-        weighted_sg_data[player_name] = calculate_weighted_sg(df.copy(), player_name)  # Pass a copy to avoid modifying original df
-        
-    # Add new columns to the dataframe for each weighted sg metric
-    for metric, _ in weighted_sg_data[list(weighted_sg_data.keys())[0]].items():
-        df[f'weighted_{metric}'] = df['player_name'].apply(lambda x: weighted_sg_data[x][metric])
+    # Iterate through each row in the dataframe
+    for i, row in df.iterrows():
+        # Get the player name and date of the current tournament
+        player_name = row['player_name']
+        current_date = row['date']
 
+        # Filter the dataframe to include only previous tournaments for this player
+        previous_tournaments = df[(df['player_name'] == player_name) & (df['date'] < current_date)]
+
+        # Calculate the weighted sg for this player based on previous tournaments
+        weighted_sg_data[player_name] = calculate_weighted_sg(previous_tournaments, player_name)
+
+        # Update the dataframe with the calculated weighted sg for this tournament
+        for metric, value in weighted_sg_data[player_name].items():
+            df.at[i, f'weighted_{metric}'] = value
+
+    # Convert dataframe to dictionary for SQL insertion
     data_for_sql = df.to_dict('records')
     
     print("CSV historical data looks good!")
 
     return data_for_sql
+
+# dict = get_historical_data()
+# df = pd.DataFrame(dict)
+# print(df.loc[df.player_name == "Scottie Scheffler"])
+
+# dict = get_historical_data()
+# df = pd.DataFrame(dict)
+# print(df.loc[df.player_name == "Scottie Scheffler"])

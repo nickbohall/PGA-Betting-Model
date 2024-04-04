@@ -15,8 +15,8 @@ router = fastapi.APIRouter()
 
 db_dependency = Depends(get_db)
 
-@router.get("/master", response_model=List[MasterSchema])
-async def read_master_from_db(db: Session = db_dependency, skip: int = 0, limit: int = 300):
+@router.get("/get_master", response_model=List[MasterSchema])
+async def read_master_from_db(db: Session = db_dependency, limit: int=300):
     db_masters = get_masters_table(db)
     if not db_masters:  # Check if the list is empty or None
         raise HTTPException(status_code=404, detail="No masters found")

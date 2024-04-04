@@ -1,6 +1,5 @@
 import pandas as pd
 import time
-from icecream import ic
 from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException
 from datetime import datetime
