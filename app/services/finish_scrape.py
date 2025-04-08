@@ -17,13 +17,13 @@ from sqlalchemy.orm import Session
 
 pd.set_option('display.max_columns', None)
 
-def get_current_tourney_finish( db: Session, tourney_name, year=CURRENT_YEAR, tourney_id=None):
+def get_tournament_results(db: Session, tournament_name, year=CURRENT_YEAR, tournament_id=None):
     driver = get_driver()
 
-    tourney_id = db.query(Tournament).filter(Tournament.tourney_name == tourney_name).first().tourney_id
-    dashed_tourney_name = "-".join(tourney_name.split(" "))
+    tournament_id = db.query(Tournament).filter(Tournament.tourney_name == tournament_name).first().tourney_id
+    dashed_tournament_name = "-".join(tournament_name.split(" "))
 
-    url = f"https://www.pgatour.com/tournaments/{year}/{dashed_tourney_name}/{tourney_id}"
+    url = f"https://www.pgatour.com/tournaments/{year}/{dashed_tournament_name}/{tournament_id}"
 
     driver.get(url)
     time.sleep(3)
@@ -33,9 +33,9 @@ def get_current_tourney_finish( db: Session, tourney_name, year=CURRENT_YEAR, to
     rows = driver.find_elements(By.CSS_SELECTOR, "tr.css-1qtrmek")
 
     for row in rows:
-        player_name = row.find_element(By.CSS_SELECTOR, "td.css-1y9jg86 span").text
-        player_finish_str = row.find_element(By.CSS_SELECTOR, "td.css-ryx8py span").text
-        player_score_str = row.find_element(By.CSS_SELECTOR, "td.css-l4z11p span").text
+        player_name = row.find_element(By.CSS_SELECTOR, "td.css-hmig5c span").text
+        player_finish_str = row.find_element(By.CSS_SELECTOR, "td.css-1psnea4 span").text
+        player_score_str = row.find_element(By.CSS_SELECTOR, "td.css-11aoq3v span").text
 
         if player_finish_str == "CUT":
             player_finish = 99
@@ -55,17 +55,17 @@ def get_current_tourney_finish( db: Session, tourney_name, year=CURRENT_YEAR, to
         else:
             player_score = int(player_score_str)
         
-        tourney_dict = {
-                        "year": year, 
-                        "tourney_id": tourney_id,
-                        "tourney_name": tourney_name,
-                        "player_name": player_name, 
-                        "player_finish": player_finish, 
-                        "player_score": player_score
-                    }
-        output_list.append(tourney_dict)
+        tournament_dict = {
+                          "year": year,
+                          "tournament_id": tournament_id,
+                          "tournament_name": tournament_name,
+                          "player_name": player_name,
+                          "player_finish": player_finish,
+                          "player_score": player_score
+                         }
+        output_list.append(tournament_dict)
 
-    print(f"{tourney_name} finishes scraped. Adding to db")
+    print(f"{tournament_name} finishes scraped. Adding to db")
     print(output_list)
 
     return output_list

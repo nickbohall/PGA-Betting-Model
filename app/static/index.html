@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PGA Betting Model</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <meta name="description" content="PGA Tour betting model with advanced filtering and sorting capabilities">
+</head>
+<body>
+    <header>
+        <h1>PGA Betting Model</h1>
+    </header>
+    
+    <div class="container">
+        <div class="actions">
+            <h2>Actions</h2>
+            <button id="refreshPlayers">Refresh Players</button>
+            <button id="refreshTournaments">Refresh Tournaments</button>
+            <button id="refreshPlayerStats">Refresh Player Stats</button>
+            
+            <div class="form-group">
+                <h3>Add Tournament</h3>
+                <input type="text" id="tournamentName" placeholder="Tournament Name">
+                <input type="number" id="tournamentYear" placeholder="Year">
+                <button id="addTournament">Add Tournament</button>
+            </div>
+            
+            <div class="form-group">
+                <h3>Update Tournament Results</h3>
+                <input type="text" id="resultsTournamentName" placeholder="Tournament Name">
+                <input type="number" id="resultsTournamentYear" placeholder="Year">
+                <button id="updateResults">Update Results</button>
+            </div>
+            
+            <div class="form-group">
+                <h3>Add Player Stats</h3>
+                <input type="text" id="playerStatsTournamentName" placeholder="Tournament Name">
+                <input type="number" id="playerStatsTournamentYear" placeholder="Year">
+                <button id="addPlayerStats">Add Player Stats</button>
+                <p class="note">This will add player stats from the player stats table to the master table for the specified tournament.</p>
+            </div>
+            
+            <div class="form-group">
+                <h3>Master Data</h3>
+                <button id="refreshMaster">Refresh Master Data</button>
+                <p class="note">This will scrape all tournament results and update the master table.</p>
+            </div>
+        </div>
+        
+        <div class="data-view">
+            <div class="tabs">
+                <button class="tab-button active" data-tab="players">Players</button>
+                <button class="tab-button" data-tab="playerStats">Player Stats</button>
+                <button class="tab-button" data-tab="tournaments">Tournaments</button>
+                <button class="tab-button" data-tab="master">Master</button>
+            </div>
+            
+            <div class="tab-content active" id="players-tab">
+                <h2>Players</h2>
+                <div class="table-container" id="players-table"></div>
+            </div>
+            
+            <div class="tab-content" id="playerStats-tab">
+                <h2>Player Stats</h2>
+                <div class="table-container" id="playerStats-table"></div>
+            </div>
+            
+            <div class="tab-content" id="tournaments-tab">
+                <h2>Tournaments</h2>
+                <div class="table-container" id="tournaments-table"></div>
+            </div>
+            
+            <div class="tab-content" id="master-tab">
+                <h2>Master</h2>
+                <div class="filter-container">
+                    <input type="text" id="masterFilterTournament" placeholder="Filter by Tournament">
+                    <input type="number" id="masterFilterYear" placeholder="Filter by Year">
+                    <button id="applyMasterFilter">Apply Filter</button>
+                    <button id="resetMasterFilter">Reset</button>
+                </div>
+                <div class="table-container" id="master-table"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="notification" class="notification"></div>
+    <script src="/static/script.js"></script>
+</body>
+</html>

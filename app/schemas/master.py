@@ -3,11 +3,11 @@ from typing import Optional
 
 class Master(BaseModel):
     year: int
-    tourney_id: str
+    tournament_id: str
     tournament_name: str
     course_name: Optional[str]
     player_name: str
-    player_id: str
+    player_id: Optional[str]
     finish: Optional[int] 
     score: Optional[int] 
     sg_total: Optional[float] 

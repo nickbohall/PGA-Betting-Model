@@ -10,7 +10,7 @@ class Master(Timestamp, Base):
     __tablename__ = "master"
     id = Column(Integer, primary_key=True, index=True)
     year = Column(Integer)
-    tourney_id = Column(String)
+    tournament_id = Column(String)
     tournament_name = Column(String)
     course_name = Column(String)
     player_id = Column(String)
